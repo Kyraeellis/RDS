@@ -1,0 +1,70 @@
+# Description:
+# This CloudFormation template creates a Virtual Private Cloud (VPC) in the US-West-2 region,
+# spanning 3 Availability Zones. It includes the creation of subnets in each Availability Zone, 
+# an internet gateway, route tables, and the necessary associations for internet access.
+# The VPC is named VPC-kyrell0357, and the template outputs the VPC ID, VPC Name, Availability Zones, 
+# and the CIDR block used for the VPC.
+
+# Revision: 1.0
+# Date: 2025-12-09
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation Template to Create VPC in US-West-2 Region spanning 3 Availability Zones
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: VPC-kyrell0357
+
+  VPCSubnetAZ1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [ 0, !GetAZs 'us-west-2' ]
+      Tags:
+        - Key: Name
+          Value: Subnet-AZ1
+
+  VPCSubnetAZ2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select [ 1, !GetAZs 'us-west-2' ]
+      Tags:
+        - Key: Name
+          Value: Subnet-AZ2
+
+  VPCSubnetAZ3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: !Select [ 2, !GetAZs 'us-west-2' ]
+      Tags:
+        - Key: Name
+          Value: Subnet-AZ3
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: VPC-kyrell0357-IGW
+
+  AttachInternetGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
